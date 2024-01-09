@@ -88,11 +88,8 @@
 		},
 		watch: {
 			keyword(keyword, oldValue) {
-				let where = ''
 				if (keyword) {
-					this.where = where + `&& /${keyword}/.test(title)`;
-				} else {
-					this.where = where;
+					this.where = `/${keyword}/.test(title)`;
 				}
 			}
 		},
