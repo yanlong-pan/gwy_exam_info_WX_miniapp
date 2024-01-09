@@ -11,38 +11,37 @@
 		<uni-nav-bar :statusBar="true" :border="false"></uni-nav-bar>
 		<!-- #endif -->
 		<view class="article-title">{{ title }}</view>
-		<unicloud-db v-slot:default="{data, loading, error, options}" :options="formData" collection="opendb-news-articles,uni-id-users"
-			:field="field" :getone="true" :where="where" :manual="true" ref="detail"
-			foreignKey="opendb-news-articles.user_id" @load="loadData">
+		<unicloud-db v-slot:default="{data, loading, error, options}" :options="formData" collection="custom-articles"
+			:field="field" :getone="true" :where="where" :manual="true" ref="detail" @load="loadData">
 			<template v-if="!loading && data">
 				<uni-list :border="false">
-					<uni-list-item thumbSize="lg" :thumb="data.image">
+					<uni-list-item>
 						<!-- 通过body插槽定义作者信息内容 -->
 						<template v-slot:body>
 							<view class="header-content">
-								<view class="uni-title">{{data.user_id && data.user_id[0] && data.user_id[0].nickname || '未知'}}</view>
+								<view class="uni-title">
+									{{data.user_id && data.user_id[0] && data.user_id[0].nickname || '未知'}}
+								</view>
 							</view>
 						</template>
 						<template v-slot:footer>
 							<view class="footer">
-								<view class="uni-note">更新于
-									<uni-dateformat :date="data.last_modify_date" format="yyyy-MM-dd hh:mm"
+								<view class="uni-note">截止日期：
+									<uni-dateformat :date="data.apply_deadline" format="yyyy-MM-dd hh:mm"
 										:threshold="[60000, 2592000000]" />
 								</view>
 							</view>
 						</template>
 					</uni-list-item>
 				</uni-list>
-				<view class="banner">
-					<!-- 文章开头，缩略图 -->
-					<image class="banner-img" :src="data.avatar" mode="widthFix"></image>
-					<!-- 文章摘要 -->
-					<view class="banner-title">
-						<text class="uni-ellipsis">{{data.excerpt}}</text>
-					</view>
-				</view>
 				<view class="article-content">
-					<rich-text :nodes="data.content"></rich-text>
+					<!-- #ifdef WEB -->
+					<u-parse :content="data.html_content" @navigate="navigate" :endHandler="custom_end">
+					<!-- #endif -->
+						<!-- #ifndef WEB -->
+						<u-parse :content="data.html_content" @navigate="navigate">
+						<!-- #endif -->
+						</u-parse>
 				</view>
 			</template>
 		</unicloud-db>
@@ -55,17 +54,20 @@
 	import uniNavBar from '@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-nav-bar.vue';
 	const uniShare = new UniShare()
 	// #endif
+	import uParse from "@/components/feng-parse/parse.vue"
 	const db = uniCloud.database();
 	const readNewsLog = db.collection('read-news-log')
 	export default {
 		// #ifdef APP
-		components:{
-			"uni-nav-bar":uniNavBar
+		components: {
+			"uni-nav-bar": uniNavBar,
 		},
-		onBackPress({from}) {
-			if(from == 'backbutton'){
-				if(uniShare.isShow){
-					this.$nextTick(function(){
+		onBackPress({
+			from
+		}) {
+			if (from == 'backbutton') {
+				if (uniShare.isShow) {
+					this.$nextTick(function() {
 						console.log(uniShare);
 						uniShare.hide()
 					})
@@ -74,6 +76,9 @@
 			}
 		},
 		// #endif
+		components: {
+			"u-parse": uParse
+		},
 		data() {
 			return {
 				// 当前显示 _id
@@ -81,7 +86,7 @@
 				title: 'title',
 				// 数据表名
 				// 查询字段，多个字段用 , 分割
-				field: 'user_id.nickname,user_id._id,avatar,excerpt,last_modify_date,comment_count,like_count,title,content',
+				field: 'apply_deadline,title,html_content',
 				formData: {
 					noData: '<p style="text-align:center;color:#666">详情加载中...</p>'
 				}
@@ -91,7 +96,7 @@
 			uniStarterConfig() {
 				return getApp().globalData.config
 			},
-			where(){
+			where() {
 				//拼接where条件 查询条件 ,更多详见 ：https://uniapp.dcloud.net.cn/uniCloud/unicloud-db?id=jsquery
 				return `_id =="${this.id}"`
 			}
@@ -126,50 +131,63 @@
 			}
 		},
 		methods: {
-			$log(...args){
-				console.log('args',...args,this.id)
+			$log(...args) {
+				console.log('args', ...args, this.id)
 			},
-			setReadNewsLog(){
+			setReadNewsLog() {
 				let item = {
-					"article_id":this.id,
-					"last_time":Date.now()
-				},
-				readNewsLog = uni.getStorageSync('readNewsLog')||[],
-				index = -1;
-				readNewsLog.forEach(({article_id},i)=>{
-					if(article_id == item.article_id){
+						"article_id": this.id,
+						"last_time": Date.now()
+					},
+					readNewsLog = uni.getStorageSync('readNewsLog') || [],
+					index = -1;
+				readNewsLog.forEach(({
+					article_id
+				}, i) => {
+					if (article_id == item.article_id) {
 						index = i
 					}
 				})
-				if(index === -1){
+				if (index === -1) {
 					readNewsLog.push(item)
-				}else{
-					readNewsLog.splice(index,1,item)
+				} else {
+					readNewsLog.splice(index, 1, item)
 				}
-				uni.setStorageSync('readNewsLog',readNewsLog)
+				uni.setStorageSync('readNewsLog', readNewsLog)
 				console.log(readNewsLog);
 			},
 			setFavorite() {
-				if ( uniCloud.getCurrentUserInfo().tokenExpired < Date.now() ){
+				if (uniCloud.getCurrentUserInfo().tokenExpired < Date.now()) {
 					return console.log('未登录用户');
 				}
 				let article_id = this.id,
 					last_time = Date.now();
-					console.log({article_id,last_time});
-					readNewsLog.where(`"article_id" == "${article_id}" && "user_id"==$env.uid`)
-						.update({last_time})
-						.then(({result:{updated}}) => {
-							console.log('updated',updated);
-							if (!updated) {
-								readNewsLog.add({article_id}).then(e=>{
-									console.log(e);
-								}).catch(err => {
-									console.log(err);
-								})
-							}
-						}).catch(err => {
-							console.log(err);
-						})
+				console.log({
+					article_id,
+					last_time
+				});
+				readNewsLog.where(`"article_id" == "${article_id}" && "user_id"==$env.uid`)
+					.update({
+						last_time
+					})
+					.then(({
+						result: {
+							updated
+						}
+					}) => {
+						console.log('updated', updated);
+						if (!updated) {
+							readNewsLog.add({
+								article_id
+							}).then(e => {
+								console.log(e);
+							}).catch(err => {
+								console.log(err);
+							})
+						}
+					}).catch(err => {
+						console.log(err);
+					})
 			},
 			loadData(data) {
 				//如果上一页未传递标题过来（如搜索直达详情），则从新闻详情中读取标题
@@ -188,7 +206,7 @@
 			 */
 			followClick() {
 				uni.showToast({
-					title:this.$t('listDetail.follow'),
+					title: this.$t('listDetail.follow'),
 					icon: 'none'
 				});
 			},
@@ -203,19 +221,20 @@
 					excerpt,
 					avatar
 				} = this.$refs.detail.dataList
-				console.log( JSON.stringify({
+				console.log(JSON.stringify({
 					_id,
 					title,
 					excerpt,
 					avatar
-				}) );
+				}));
 				uniShare.show({
 					content: { //公共的分享类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
 						type: 0,
 						href: this.uniStarterConfig.h5.url + `/#/pages/list/detail?id=${_id}&title=${title}`,
 						title: this.title,
 						summary: excerpt,
-						imageUrl: avatar + '?x-oss-process=image/resize,m_fill,h_100,w_100' //压缩图片解决，在ios端分享图过大导致的图片失效问题
+						imageUrl: avatar +
+							'?x-oss-process=image/resize,m_fill,h_100,w_100' //压缩图片解决，在ios端分享图过大导致的图片失效问题
 					},
 					menus: [{
 							"img": "/static/app-plus/sharemenu/wechatfriend.png",
@@ -278,8 +297,59 @@
 				}, e => { //callback
 					console.log(e);
 				})
-			}
+			},
 			// #endif
+			// #ifdef WEB
+			// 定义文件下载函数
+			downloadFile(url, filename) {
+				// 使用fetch绕开浏览器同源策略
+				fetch(url)
+					.then((response) => response.blob())
+					.then((blob) => {
+						const url = window.URL.createObjectURL(blob);
+						// 创建 <a> 元素并触发点击操作进行下载，以避免需要用户手动保存
+						const a = document.createElement('a');
+						a.style.display = 'none';
+						a.href = url;
+						a.download = filename;
+						document.body.appendChild(a);
+						a.click();
+						window.URL.revokeObjectURL(url);
+					})
+					.catch((error) => {
+						console.error('下载文件时出错：', error);
+					});
+			},
+			custom_end(node, results) {
+				if (node.tag === "a" && node.nodes !== undefined) {
+					// 获取链接元素的文字以供后续使用
+					node.attr.text = node.nodes.filter(node => node.node === 'text')[0].text;
+				}
+			},
+			// #endif
+			navigate(href, e, attr) {
+				// #ifdef WEB
+				this.downloadFile(href, attr.text)
+				// #endif
+				// #ifndef WEB
+				// 本地临时文件：临时产生，随时会被回收的文件。运行时最多存储 4GB，结束运行后，如果已使用超过 2GB，会以文件为维度按照最近使用时间从远到近进行清理至少于2GB。
+				// 详情见 https://developers.weixin.qq.com/miniprogram/dev/framework/ability/file-system.html
+				if (href.includes('file') || href.includes('attach')) {
+					uni.downloadFile({
+						url: href,
+						success: function(res) {
+							const filePath = res.tempFilePath;
+							uni.openDocument({
+								filePath: filePath,
+								success: function(res) {
+									console.log(`文件打开成功: ${filePath}`);
+								}
+							});
+						}
+					});
+				}
+				// #endif
+			}
 		}
 	}
 </script>
