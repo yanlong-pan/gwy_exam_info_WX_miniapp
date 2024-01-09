@@ -189,7 +189,7 @@ import wxParseTemplate from './components/wxParseTemplate0';
 			},
 			navigate(href, $event, attr) {
 				console.log(href, attr);
-				this.$emit('navigate', href, $event);
+				this.$emit('navigate', href, $event, attr);
 			},
 			preview(src, $event) {
 				if (!this.imageUrls.length || typeof this.imgOptions === 'boolean') {
