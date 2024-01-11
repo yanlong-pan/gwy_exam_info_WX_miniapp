@@ -4,26 +4,31 @@
 		<statusBar></statusBar>
 		<!-- #endif -->
 
+		<view>
+			<le-dropdown v-model:menuList="menuList" themeColor="#3185FF" :duration="300" :isCeiling="false"
+				@onConfirm="onConfirm"></le-dropdown>
+		</view>
+
 		<!-- 搜索功能 -->
 		<view class="uni-search-box">
-			<uni-search-bar v-model="keyword" ref="searchBar" radius="100" cancelButton="none" disabled
+			<uni-search-bar v-model="searchText" ref="searchBar" radius="100" cancelButton="none" disabled
 				:placeholder="inputPlaceholder" />
 			<view class="cover-search-bar" @click="searchClick"></view>
 		</view>
 
 		<unicloud-db ref='udb' v-slot:default="{data,pagination,hasMore, loading, error, options}" @error="onqueryerror"
-			collection="custom-articles" :where="where" :page-size="10"
-			>
+			collection="custom-articles" :where="where" :page-size="10">
 			<!-- 基于 uni-list 的页面布局 field="user_id.nickname"-->
 			<uni-list class="uni-list" :border="false" :style="{height:listHight}">
-				
+
 				<!-- 作用于app端nvue页面的下拉加载 -->
 				<!-- #ifdef APP-NVUE -->
 				<refreshBox @refresh="refresh" :loading="loading"></refreshBox>
 				<!-- #endif -->
 
 				<!-- 列表渲染 -->
-				<uni-list-item :to="'/pages/list/detail?id='+item._id+'&title='+item.title" v-for="(item,index) in data" :key="index">
+				<uni-list-item :to="'/pages/list/detail?id='+item._id+'&title='+item.title" v-for="(item,index) in data"
+					:key="index">
 					<!-- 通过header插槽定义列表左侧图片 -->
 					<!-- <template v-slot:header>
 						<image class="avatar" :src="item.avatar" mode="aspectFill"></image>
@@ -34,8 +39,8 @@
 							<text class="title">{{item.title}}</text>
 							<view class="info">
 								<!-- <text class="author">{{item.user_id[0]?item.user_id[0].nickname:''}}</text> -->
-								<uni-dateformat class="last_modify_date" :date="item.apply_deadline"
-									format="yyyy-MM-dd" :threshold="[60000, 2592000000]" />
+								<uni-dateformat class="last_modify_date" :date="item.apply_deadline" format="yyyy-MM-dd"
+									:threshold="[60000, 2592000000]" />
 							</view>
 						</view>
 					</template>
@@ -44,30 +49,37 @@
 				<!-- #ifdef APP-PLUS -->
 				<uni-list-item>
 					<template v-slot:body>
-				<!-- #endif -->
+					<!-- #endif -->
 						<uni-load-state @networkResume="refresh" :state="{data,pagination,hasMore, loading, error}"
 							@loadMore="loadMore">
 						</uni-load-state>
-				<!-- #ifdef APP-PLUS -->
+					<!-- #ifdef APP-PLUS -->
 					</template>
 				</uni-list-item>
 				<!-- #endif -->
 			</uni-list>
 		</unicloud-db>
-		
+
 	</view>
 </template>
+
 
 <script>
 	let cdbRef;
 	import statusBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-status-bar";
-
+	import {
+		DropdownMenu
+	} from "./dropdown-setting.js";
+	import LeDropdown from "@/uni_modules/le-dropdown/components/le-dropdown/le-dropdown";
 	import Gps from '@/uni_modules/json-gps/js_sdk/gps.js';
-	const gps = new Gps(),db = uniCloud.database();
+
+	const gps = new Gps(),
+		db = uniCloud.database();
 
 	export default {
 		components: {
-			statusBar
+			statusBar,
+			"le-dropdown": LeDropdown
 		},
 		computed: {
 			inputPlaceholder(e) {
@@ -81,22 +93,33 @@
 		data() {
 			return {
 				where: '',
-				keyword: "",
+				searchText: '',
+				filters: [],
 				showRefresh: false,
-				listHight: 0
+				listHight: 0,
+				menuList: DropdownMenu
 			}
 		},
 		watch: {
-			keyword(keyword, oldValue) {
-				if (keyword) {
-					this.where = `/${keyword}/.test(title)`;
-				}
+			searchText(searchText, oldValue) {
+				// if (searchText) {
+				// 	if (this.where.length) {
+				// 		this.where += ' && '
+				// 	}
+				// 	this.where += `/${searchText}/.test(title)`;
+				// 	console.log('watch', this.where)
+				// } else {
+				// 	this.where = ''
+				// }
+				console.log('searchText: ', searchText)
+				this.buildWhere()
 			}
 		},
 		async onReady() {
 			// #ifdef APP-NVUE
 			/* 可用窗口高度 - 搜索框高 - 状态栏高 */
-			this.listHight = uni.getSystemInfoSync().windowHeight - uni.getSystemInfoSync().statusBarHeight - 50 + 'px';
+			this.listHight = uni.getSystemInfoSync().windowHeight - uni.getSystemInfoSync().statusBarHeight - 50 +
+				'px';
 			// #endif
 			// #ifndef APP-NVUE
 			this.listHight = 'auto'
@@ -104,7 +127,7 @@
 			cdbRef = this.$refs.udb
 		},
 		async onShow() {
-			this.keyword = getApp().globalData.searchText
+			this.searchText = getApp().globalData.searchText
 			getApp().globalData.searchText = ''
 			//这里仅演示如何，在onShow生命周期获取设备位置，并在设备或者应用没有权限时自动引导。设置完毕自动重新获取。
 			//你可以基于他做自己的业务，比如：根据距离由近到远排序列表数据等
@@ -158,9 +181,53 @@
 			onpullingdown(e) {
 				console.log(e);
 				this.showRefresh = true
-				if(e.pullingDistance>100){
+				if (e.pullingDistance > 100) {
 					this.refresh()
 				}
+			},
+			buildWhere() {
+				let searchCondition = ''
+				if (this.searchText) {
+					searchCondition = `/${this.searchText}/.test(title)`
+				}
+				let filterCondtions = ''
+				if (this.filters.length) {
+					filterCondtions = this.filters.join(' && ')
+				}
+
+				if (searchCondition && filterCondtions) {
+					this.where = searchCondition + ' && ' + filterCondtions
+				}
+
+				if (searchCondition && !filterCondtions) {
+					this.where = searchCondition
+				}
+
+				if (!searchCondition && filterCondtions) {
+					this.where = filterCondtions
+				}
+
+				if (!searchCondition && !filterCondtions) {
+					this.where = ''
+				}
+				console.log('searchCondition: ', searchCondition)
+				console.log('filterCondtions: ', filterCondtions)
+				console.log('built where condition: ', this.where)
+			},
+			onConfirm(data) {
+				this.filters = []
+				const examTypes = data.children[0].value
+				const infoTypes = data.children[1].value
+				// console.log(examTypes)
+				// console.log(infoTypes)
+				if (examTypes.length) {
+					this.filters.push(`exam_type in ${JSON.stringify(examTypes)}`)
+				}
+				if (infoTypes.length) {
+					this.filters.push(`info_type in ${JSON.stringify(infoTypes)}`)
+				}
+				this.buildWhere()
+				console.log('filters: ', this.filters)
 			}
 		},
 		// #ifndef APP-NVUE
@@ -181,6 +248,15 @@
 		box-sizing: border-box;
 		flex-direction: column;
 	}
+
+	.viewport {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		padding: 180rpx 0 0;
+		position: relative;
+	}
+
 	/* #endif */
 	.pages {
 		background-color: #FFFFFF;
@@ -225,6 +301,7 @@
 		width: 580rpx;
 		/* #endif */
 	}
+
 	.cover-search-bar {
 		height: 50px;
 		position: relative;
