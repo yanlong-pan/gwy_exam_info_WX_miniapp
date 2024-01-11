@@ -546,6 +546,7 @@
 		.le-dropdown-filter-content {
 			display: flex;
 			flex-wrap: wrap;
+			flex-direction: row;
 		}
 
 		.le-dropdown-filter-box {
@@ -570,6 +571,7 @@
 
 	.le-dropdown-footer {
 		display: flex;
+		flex-direction: row;
 		align-items: center;
 		margin-top: 14rpx;
 
