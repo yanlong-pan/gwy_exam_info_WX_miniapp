@@ -13,8 +13,8 @@
 		},
 		"article_id": {
 			"bsonType": "string",
-			"description": "文章id，参考opendb-news-articles表",
-			"foreignKey": "opendb-news-articles._id"
+			"description": "文章id，原参考opendb-news-articles表，现参考custom-articles表",
+			"foreignKey": "custom-articles._id"
 		},
 		"user_id": {
 			"bsonType": "string",
