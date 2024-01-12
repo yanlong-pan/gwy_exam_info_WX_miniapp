@@ -4,17 +4,17 @@
 		<statusBar></statusBar>
 		<!-- #endif -->
 
-		<view>
-			<le-dropdown v-model:menuList="menuList" themeColor="#3185FF" :duration="300" :isCeiling="false"
-				@onConfirm="onConfirm"></le-dropdown>
-		</view>
-
 		<!-- 搜索功能 -->
 		<view class="uni-search-box">
 			<uni-search-bar v-model="searchText" ref="searchBar" radius="100" cancelButton="none" disabled
 				:placeholder="inputPlaceholder" />
 			<view class="cover-search-bar" @click="searchClick"></view>
 		</view>
+
+		<!-- <view> -->
+		<le-dropdown v-model:menuList="menuList" themeColor="#3185FF" :duration="300" :isCeiling="false"
+			@onConfirm="onConfirm"></le-dropdown>
+		<!-- </view> -->
 
 		<unicloud-db ref='udb' v-slot:default="{data,pagination,hasMore, loading, error, options}" @error="onqueryerror"
 			collection="custom-articles" :where="where" :page-size="10">
@@ -247,14 +247,6 @@
 		display: flex;
 		box-sizing: border-box;
 		flex-direction: column;
-	}
-
-	.viewport {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		padding: 180rpx 0 0;
-		position: relative;
 	}
 
 	/* #endif */
