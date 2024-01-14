@@ -1,0 +1,7 @@
+{
+  "name": "test-uni-ai",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-ai": {}
+  }
+}

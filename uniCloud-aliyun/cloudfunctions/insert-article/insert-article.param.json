@@ -1,0 +1,6 @@
+// 本文件中的json内容将在云函数【运行】时作为参数传给云函数。
+// 配置教程参考：https://uniapp.dcloud.net.cn/uniCloud/rundebug.html#runparam
+
+{
+	"body": "{\"id\":\"1374df441-b55f-42c0-bd08-fbda02c08058\",\"title\":\"自然资源部北海局所属事业单位2024年公开招聘(不含博士研究生岗位)公告ddd\",\"province\":\"1国家\",\"exam_type\":\"事业单位\",\"info_type\":\"招考公告\",\"collect_date\":1703520000,\"apply_deadline\":\"2024-1-11 24:00\",\"html_content\":\"something\"}"
+}
