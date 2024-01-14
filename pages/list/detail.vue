@@ -19,9 +19,9 @@
 						<!-- 通过body插槽定义作者信息内容 -->
 						<template v-slot:body>
 							<view class="header-content">
-								<view class="uni-title">
-									{{data.user_id && data.user_id[0] && data.user_id[0].nickname || '未知'}}
-								</view>
+								<uni-fav :checked="is_favorite" class="favBtn" :circle="true" bg-color="#dd524d"
+									bg-color-checked="#007aff" fg-color="#ffffff" fg-color-checked="#ffffff"
+									@click="likeArticle(data._id)" />
 							</view>
 						</template>
 						<template v-slot:footer>
@@ -83,6 +83,7 @@
 			return {
 				// 当前显示 _id
 				id: "",
+				is_favorite: false,
 				title: 'title',
 				// 数据表名
 				// 查询字段，多个字段用 , 分割
@@ -320,6 +321,7 @@
 						console.error('下载文件时出错：', error);
 					});
 			},
+
 			custom_end(node, results) {
 				if (node.tag === "a" && node.nodes !== undefined) {
 					// 获取链接元素的文字以供后续使用
@@ -349,7 +351,30 @@
 					});
 				}
 				// #endif
-			}
+			},
+			likeArticle(articleId) {
+				// console.log(articleId)
+				this.is_favorite = !this.is_favorite;
+				// const db = uniCloud.database()
+				// const favorite = db.collection('opendb-news-favorite').where(
+				// 	`user_id == "${auth.uid}" && article_id == "${articleId}"`).get()
+				// console.log(favorite)
+
+				// uniCloud.callFunction({
+				// 	name: 'test-auth-uid'
+				// }).then((res) => {
+				// 	console.log(res.result) // 结果是 {sum: 3}
+				// }).catch((err) => {
+				// 	console.error(err)
+				// })
+
+				const articlesCloudObj = uniCloud.importObject('articles');
+				articlesCloudObj.is_favorite(articleId).then((res) => {
+					console.log('response is : ', res)
+				}).catch((err) => {
+					console.log(err)
+				});
+			},
 		}
 	}
 </script>
