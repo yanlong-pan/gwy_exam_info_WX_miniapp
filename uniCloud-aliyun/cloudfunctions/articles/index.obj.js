@@ -7,20 +7,36 @@ module.exports = {
 		this.uniID = uniID.createInstance({ // 创建uni-id实例，其上方法同uniID
 			clientInfo
 		})
+
+		this.dbJQL = uniCloud.databaseForJQL({
+			clientInfo: this.getClientInfo()
+		})
+
+		this.getUid = async () => {
+			const token = this.getUniIdToken()
+			// 未登录，无token
+			if (!token) {
+				return [false, undefined]
+			}
+			payload = await this.uniID.checkToken(token)
+			// token验证失败
+			if (payload.errCode != 0) {
+				return [false, undefined]
+			}
+			const userId = payload.uid
+			return [true, userId]
+		}
 	},
 	insert: async function(params) {
 		const httpInfo = this.getHttpInfo()
 		const article = JSON.parse(httpInfo.body)
-		const dbJQL = uniCloud.databaseForJQL({
-			clientInfo: this.getClientInfo()
-		})
 		let inputArticleTitle = article.title
-		const existingArticleNum = await dbJQL.collection('custom-articles')
+		const existingArticleNum = await this.dbJQL.collection('custom-articles')
 			.where(`title=="${inputArticleTitle}"`)
 			.count()
 		console.log(existingArticleNum.total)
 		if (existingArticleNum.total === 0) {
-			const bookQueryRes = await dbJQL.collection('custom-articles').add(article) // 直接执行数据库操作
+			const bookQueryRes = await this.dbJQL.collection('custom-articles').add(article) // 直接执行数据库操作
 			return {
 				success: true,
 				data: {
@@ -37,11 +53,7 @@ module.exports = {
 		}
 	},
 	max_collect_date: async function(params) {
-		const dbJQL = uniCloud.databaseForJQL({
-			clientInfo: this.getClientInfo()
-		})
-
-		const queryRes = await dbJQL.collection('custom-articles').where({
+		const queryRes = await this.dbJQL.collection('custom-articles').where({
 			"province": params.province,
 			"exam_type": params.exam_type,
 			"info_type": params.info_type,
@@ -60,11 +72,64 @@ module.exports = {
 		}
 	},
 	is_favorite: async function(params) {
-		const token = this.getUniIdToken()
-		payload = await this.uniID.checkToken(token)
-		return {
-			'payload': payload,
-			'params': params
+		const [
+			success,
+			userId
+		] = await this.getUid()
+		if (!success) {
+			return {
+				success: false,
+				data: {
+					message: '未登录'
+				}
+			}
 		}
+		const queryRes = await this.dbJQL.collection('opendb-news-favorite')
+			.where(`article_id == "${params.articleId}" && user_id == "${userId}"`)
+			.count()
+
+		return {
+			success: true,
+			data: {
+				is_favorite: queryRes.total === 1
+			}
+		}
+	},
+	add_favorite: async function(params) {
+		const [
+			success,
+			userId
+		] = await this.getUid()
+		if (!success) {
+			return {
+				success: false,
+				data: {
+					message: '未登录'
+				}
+			}
+		}
+
+		this.dbJQL.collection('opendb-news-favorite').add({
+			article_id: params.articleId,
+			user_id: userId
+		})
+	},
+	delete_favorite: async function(params) {
+		const [
+			success,
+			userId
+		] = await this.getUid()
+		if (!success) {
+			return {
+				success: false,
+				data: {
+					message: '未登录'
+				}
+			}
+		}
+
+		this.dbJQL.collection('opendb-news-favorite')
+			.where(`article_id == "${params.articleId}" && user_id == "${userId}"`)
+			.remove()
 	}
 }

@@ -21,7 +21,7 @@
 							<view class="header-content">
 								<uni-fav :checked="is_favorite" class="favBtn" :circle="true" bg-color="#dd524d"
 									bg-color-checked="#007aff" fg-color="#ffffff" fg-color-checked="#ffffff"
-									@click="likeArticle(data._id)" />
+									@click="switchFavArtivle(data._id)" />
 							</view>
 						</template>
 						<template v-slot:footer>
@@ -90,7 +90,8 @@
 				field: 'apply_deadline,title,html_content',
 				formData: {
 					noData: '<p style="text-align:center;color:#666">详情加载中...</p>'
-				}
+				},
+				articlesCloudObj: uniCloud.importObject('articles')
 			}
 		},
 		computed: {
@@ -114,6 +115,9 @@
 					title: event.title
 				})
 			}
+
+			this.checkArticleIsFavorited(this.id)
+
 		},
 		onReady() {
 			// 开始加载数据，修改 where 条件后才开始去加载 clinetDB 的数据 ，需要等组件渲染完毕后才开始执行 loadData，所以不能再 onLoad 中执行
@@ -134,6 +138,16 @@
 		methods: {
 			$log(...args) {
 				console.log('args', ...args, this.id)
+			},
+			async checkArticleIsFavorited(articleId) {
+				const result = await this.articlesCloudObj.is_favorite({
+					'articleId': articleId
+				})
+				if (result.success && result.data.is_favorite) {
+					this.is_favorite = true
+				} else {
+					this.is_favorite = false
+				}
 			},
 			setReadNewsLog() {
 				let item = {
@@ -352,28 +366,39 @@
 				}
 				// #endif
 			},
-			likeArticle(articleId) {
-				// console.log(articleId)
-				this.is_favorite = !this.is_favorite;
-				// const db = uniCloud.database()
-				// const favorite = db.collection('opendb-news-favorite').where(
-				// 	`user_id == "${auth.uid}" && article_id == "${articleId}"`).get()
-				// console.log(favorite)
-
-				// uniCloud.callFunction({
-				// 	name: 'test-auth-uid'
-				// }).then((res) => {
-				// 	console.log(res.result) // 结果是 {sum: 3}
-				// }).catch((err) => {
-				// 	console.error(err)
-				// })
-
-				const articlesCloudObj = uniCloud.importObject('articles');
-				articlesCloudObj.is_favorite(articleId).then((res) => {
-					console.log('response is : ', res)
-				}).catch((err) => {
-					console.log(err)
-				});
+			switchFavArtivle(articleId) {
+				const shouldFav = !this.is_favorite;
+				if (shouldFav) {
+					this.articlesCloudObj.add_favorite({
+						'articleId': articleId
+					}).then((res) => {
+						console.log('add_favorite is : ', res)
+						if (res && !res.success) {
+							uni.navigateTo({
+								url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+							})
+						} else {
+							this.is_favorite = shouldFav;
+						}
+					}).catch((err) => {
+						console.log(err)
+					});
+				} else {
+					this.articlesCloudObj.delete_favorite({
+						'articleId': articleId
+					}).then((res) => {
+						console.log('delete_favorite is : ', res)
+						if (res && !res.success) {
+							uni.navigateTo({
+								url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+							})
+						} else {
+							this.is_favorite = shouldFav;
+						}
+					}).catch((err) => {
+						console.log(err)
+					});
+				}
 			},
 		}
 	}
