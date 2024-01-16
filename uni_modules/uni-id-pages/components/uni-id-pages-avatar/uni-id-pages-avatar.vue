@@ -69,42 +69,48 @@
 					avatar_file
 				})
 			},
-			async bindchooseavatar(res) {
-				let avatarUrl = res.detail.avatarUrl
-				let avatar_file = {
-					extname: avatarUrl.split('.')[avatarUrl.split('.').length - 1],
-					name: '',
-					url: ''
-				}
-				//上传到服务器
-				let cloudPath = 'avatar/' + this.userInfo._id + '/' + Date.now()
-				avatar_file.name = cloudPath
+			replaceAvatar(filePath, avatar_file) {
 				try {
 					uni.showLoading({
 						title: "更新中",
 						mask: true
 					});
 
-					const deleteRes = await uniCloud.importObject('avatar').del_avatar_from_cloud_storage()
-					console.log('del_avatar: ', deleteRes)
+					let cloudPath = 'avatar/' + this.userInfo._id + '/' + Date.now()
+					avatar_file.name = cloudPath
+					uniCloud.importObject('avatar').del_avatar_from_cloud_storage()
+						.then(async (res) => {
+							console.log('del_avatar: ', res)
+							await uniCloud.uploadFile({
+								filePath: filePath,
+								cloudPath: cloudPath,
+								cloudPathAsRealPath: true,
+								fileType: "image",
+								success: (res) => {
+									console.log('uploadImage success, res is:', res)
+									avatar_file.url = res.fileID
+									uni.hideLoading()
+									this.setAvatarFile(avatar_file)
+								}
+							});
+						})
 
-					uniCloud.uploadFile({
-						filePath: avatarUrl,
-						cloudPath: cloudPath,
-						cloudPathAsRealPath: true,
-						fileType: "image",
-						success: (res) => {
-							console.log('uploadImage success, res is:', res)
-							avatar_file.url = res.fileID
-							uni.hideLoading()
-							this.setAvatarFile(avatar_file)
-						}
-					});
 				} catch (e) {
 					console.error('error: ', e);
+					uni.showToast({
+						icon: 'none',
+						title: '替换头像失败'
+					})
 				}
-				console.log('avatar_file', avatar_file);
-				this.setAvatarFile(avatar_file)
+			},
+			bindchooseavatar(res) {
+				let avatarUrl = res.detail.avatarUrl
+				let avatar_file = {
+					extname: avatarUrl.split('.')[avatarUrl.split('.').length - 1],
+					name: '',
+					url: ''
+				}
+				this.replaceAvatar(avatarUrl, avatar_file)
 			},
 			uploadAvatarImg(res) {
 				// #ifdef MP-WEIXIN
@@ -138,28 +144,7 @@
 							},
 							filePath = res.tempFilePaths[0]
 
-						let cloudPath = 'avatar/' + this.userInfo._id + '/' + Date.now()
-						avatar_file.name = cloudPath
-						uni.showLoading({
-							title: "更新中",
-							mask: true
-						});
-
-						const deleteRes = await uniCloud.importObject('avatar').del_avatar_from_cloud_storage()
-						console.log('del_avatar: ', deleteRes)
-
-						uniCloud.uploadFile({
-							filePath: filePath,
-							cloudPath: cloudPath,
-							cloudPathAsRealPath: true,
-							fileType: "image",
-							success: (res) => {
-								console.log('uploadImage success, res is:', res)
-								avatar_file.url = res.fileID
-								uni.hideLoading()
-								this.setAvatarFile(avatar_file)
-							}
-						});
+						this.replaceAvatar(filePath, avatar_file)
 					}
 				})
 				// #endif
