@@ -77,24 +77,31 @@
 					url: ''
 				}
 				//上传到服务器
-				let cloudPath = this.userInfo._id + '' + Date.now()
+				let cloudPath = 'avatar/' + this.userInfo._id + '/' + Date.now()
 				avatar_file.name = cloudPath
 				try {
 					uni.showLoading({
 						title: "更新中",
 						mask: true
 					});
-					let {
-						fileID
-					} = await uniCloud.uploadFile({
+
+					const deleteRes = await uniCloud.importObject('avatar').del_avatar_from_cloud_storage()
+					console.log('del_avatar: ', deleteRes)
+
+					uniCloud.uploadFile({
 						filePath: avatarUrl,
-						cloudPath,
-						fileType: "image"
+						cloudPath: cloudPath,
+						cloudPathAsRealPath: true,
+						fileType: "image",
+						success: (res) => {
+							console.log('uploadImage success, res is:', res)
+							avatar_file.url = res.fileID
+							uni.hideLoading()
+							this.setAvatarFile(avatar_file)
+						}
 					});
-					avatar_file.url = fileID
-					uni.hideLoading()
 				} catch (e) {
-					console.error(e);
+					console.error('error: ', e);
 				}
 				console.log('avatar_file', avatar_file);
 				this.setAvatarFile(avatar_file)
@@ -131,15 +138,20 @@
 							},
 							filePath = res.tempFilePaths[0]
 
-						let cloudPath = this.userInfo._id + '' + Date.now()
+						let cloudPath = 'avatar/' + this.userInfo._id + '/' + Date.now()
 						avatar_file.name = cloudPath
 						uni.showLoading({
 							title: "更新中",
 							mask: true
 						});
+
+						const deleteRes = await uniCloud.importObject('avatar').del_avatar_from_cloud_storage()
+						console.log('del_avatar: ', deleteRes)
+
 						uniCloud.uploadFile({
 							filePath: filePath,
 							cloudPath: cloudPath,
+							cloudPathAsRealPath: true,
 							fileType: "image",
 							success: (res) => {
 								console.log('uploadImage success, res is:', res)
