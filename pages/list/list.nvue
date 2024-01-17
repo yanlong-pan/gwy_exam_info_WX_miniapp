@@ -4,17 +4,19 @@
 		<statusBar></statusBar>
 		<!-- #endif -->
 
-		<!-- 搜索功能 -->
-		<view class="uni-search-box">
-			<uni-search-bar v-model="searchText" ref="searchBar" radius="100" cancelButton="none" disabled
-				:placeholder="inputPlaceholder" />
-			<view class="cover-search-bar" @click="searchClick"></view>
-		</view>
+		<view class="search-and-filter">
+			<!-- 搜索功能 -->
+			<view class="uni-search-box">
+				<uni-search-bar v-model="searchText" ref="searchBar" radius="100" cancelButton="none" disabled
+					:placeholder="inputPlaceholder" bgColor="#F5F5F5" />
+				<view class="cover-search-bar" @click="searchClick"></view>
+			</view>
 
-		<!-- <view> -->
-		<le-dropdown v-model:menuList="menuList" themeColor="#3185FF" :duration="300" :isCeiling="false"
-			@onConfirm="onConfirm"></le-dropdown>
-		<!-- </view> -->
+			<view>
+				<le-dropdown v-model:menuList="menuList" themeColor="#3185FF" :duration="300" :isCeiling="false"
+					@onConfirm="onConfirm"></le-dropdown>
+			</view>
+		</view>
 
 		<unicloud-db ref='udb' v-slot:default="{data,pagination,hasMore, loading, error, options}" @error="onqueryerror"
 			collection="custom-articles" :where="where" :page-size="10">
@@ -290,7 +292,10 @@
 		z-index: 9;
 		/* #endif */
 		/* #ifdef MP-WEIXIN */
-		width: 580rpx;
+		width: 480rpx;
+		/* #endif */
+		/* #ifdef H5 */
+		width: 50vw;
 		/* #endif */
 	}
 
@@ -302,5 +307,46 @@
 		/* #ifndef APP-NVUE */
 		z-index: 999;
 		/* #endif */
+	}
+
+	.search-and-filter {
+		display: flex;
+		flex-direction: row;
+		margin-top: 40px;
+		align-items: center;
+		justify-content: space-evenly;
+	}
+
+	>>>.le-dropdown .le-dropdown-content {
+		/* #ifdef MP-WEIXIN */
+		left: -600rpx !important;
+		width: 750rpx !important;
+		/* #endif */
+		/* #ifdef H5 */
+		left: -76vw !important;
+		width: 100vw !important;
+		/* #endif */
+		top: 50px !important;
+	}
+
+	/* #ifdef H5 */
+	>>>.le-dropdown .le-dropdown-menu {
+		background-color: #F5F5F5;
+		border-radius: 100px;
+		width: 10vw;
+	}
+
+	/* #endif */
+
+	>>>.le-dropdown .le-dropdown-filter-content {
+		flex-direction: row !important;
+	}
+
+	>>>.le-dropdown-footer {
+		flex-direction: row !important;
+	}
+
+	>>>.le-flex {
+		justify-content: center;
 	}
 </style>
