@@ -2,12 +2,13 @@
 	<view class="center">
 		<uni-sign-in ref="signIn"></uni-sign-in>
 		<view class="userInfo" @click.capture="toUserInfo">
-			<cloud-image width="150rpx" height="150rpx" v-if="hasLogin&&userInfo.avatar_file&&userInfo.avatar_file.url" :src="userInfo.avatar_file.url"></cloud-image>
-			
+			<cloud-image width="150rpx" height="150rpx" v-if="hasLogin&&userInfo.avatar_file&&userInfo.avatar_file.url"
+				:src="userInfo.avatar_file.url"></cloud-image>
+
 			<view v-else class="defaultAvatarUrl">
 				<uni-icons color="#ffffff" size="50" type="person-filled" />
 			</view>
-			
+
 			<view class="logo-title">
 				<text class="uer-name" v-if="hasLogin">{{userInfo.nickname||userInfo.username||userInfo.mobile}}</text>
 				<text class="uer-name" v-else>{{$t('mine.notLogged')}}</text>
@@ -48,9 +49,11 @@
 	} from '@/uni_modules/uni-id-pages/common/store.js'
 	export default {
 		// #ifdef APP
-		onBackPress({from}) {
-			if(from=='backbutton'){
-				this.$nextTick(function(){
+		onBackPress({
+			from
+		}) {
+			if (from == 'backbutton') {
+				this.$nextTick(function() {
 					uniShare.hide()
 				})
 				return uniShare.isShow;
@@ -98,7 +101,7 @@
 						},
 						//#endif
 						{
-							"title":this.$t('mine.readArticles'),
+							"title": this.$t('mine.readArticles'),
 							"to": '/pages/ucenter/read-news-log/read-news-log',
 							"icon": "flag"
 						},
@@ -148,7 +151,7 @@
 		onLoad() {
 			//#ifdef APP-PLUS
 			this.ucenterList[this.ucenterList.length - 2].unshift({
-				title:this.$t('mine.checkUpdate'),// this.this.$t('mine.checkUpdate')"检查更新"
+				title: this.$t('mine.checkUpdate'), // this.this.$t('mine.checkUpdate')"检查更新"
 				rightText: this.appVersion.version + '-' + this.appVersion.versionCode,
 				event: 'checkVersion',
 				icon: 'loop',
@@ -156,13 +159,12 @@
 			})
 			//#endif
 		},
-		onShow() {
-		},
+		onShow() {},
 		computed: {
 			userInfo() {
 				return store.userInfo
 			},
-			hasLogin(){
+			hasLogin() {
 				return store.hasLogin
 			},
 			// #ifdef APP-PLUS
@@ -183,7 +185,7 @@
 			signIn() { //普通签到
 				this.$refs.signIn.open()
 			},
-			signInByAd(){ //看激励视频广告签到
+			signInByAd() { //看激励视频广告签到
 				this.$refs.signIn.showRewardedVideoAd()
 			},
 			/**
@@ -214,7 +216,7 @@
 			tapGrid(index) {
 				uni.showToast({
 					// title: '你点击了，第' + (index + 1) + '个',
-					title: this.$t('mine.clicked') + " " + (index + 1) ,
+					title: this.$t('mine.clicked') + " " + (index + 1),
 					icon: 'none'
 				});
 			},
@@ -226,10 +228,13 @@
 				if (uni.getSystemInfoSync().platform == "ios") {
 					// 这里填写appstore应用id
 					let appstoreid = this.appConfig.marketId.ios; // 'id1417078253';
-					console.log({appstoreid});
-					plus.runtime.openURL("itms-apps://" + 'itunes.apple.com/cn/app/wechat/' + appstoreid + '?mt=8',err=>{
-						console.log('plus.runtime.openURL err:' + JSON.stringify(err));
+					console.log({
+						appstoreid
 					});
+					plus.runtime.openURL("itms-apps://" + 'itunes.apple.com/cn/app/wechat/' + appstoreid + '?mt=8',
+						err => {
+							console.log('plus.runtime.openURL err:' + JSON.stringify(err));
+						});
 				}
 				if (uni.getSystemInfoSync().platform == "android") {
 					var Uri = plus.android.importClass("android.net.Uri");
@@ -253,7 +258,7 @@
 					mask: true
 				})
 				db.collection("uni-id-scores")
-					.where('"user_id" == $env.uid')
+					.where('"user_id" == $cloudEnv_uid')
 					.field('score,balance')
 					.orderBy("create_date", "desc")
 					.limit(1)
@@ -262,25 +267,29 @@
 						console.log(res);
 						const data = res.result.data[0];
 						let msg = '';
-						msg = data ? (this.$t('mine.currentScore')+ data.balance) : this.$t('mine.noScore');
+						msg = data ? (this.$t('mine.currentScore') + data.balance) : this.$t('mine.noScore');
 						uni.showToast({
 							title: msg,
 							icon: 'none'
 						});
-					}).finally(()=>{
+					}).finally(() => {
 						uni.hideLoading()
 					})
 			},
 			async share() {
-				let {result} = await db.collection('uni-id-users').where("'_id' == $cloudEnv_uid").field('my_invite_code').get()
+				let {
+					result
+				} = await db.collection('uni-id-users').where("'_id' == $cloudEnv_uid").field('my_invite_code').get()
 				let myInviteCode = result.data[0].my_invite_code
-				if(!myInviteCode){
+				if (!myInviteCode) {
 					return uni.showToast({
 						title: '请检查uni-config-center中uni-id配置，是否已启用 autoSetInviteCode',
 						icon: 'none'
 					});
 				}
-				console.log({myInviteCode});
+				console.log({
+					myInviteCode
+				});
 				let {
 					appName,
 					logo,
@@ -360,8 +369,9 @@
 	page {
 		background-color: #f8f8f8;
 	}
+
 	/* #endif*/
-	
+
 	.center {
 		flex: 1;
 		flex-direction: column;
@@ -375,7 +385,8 @@
 		flex-direction: column;
 		align-items: center;
 	}
-	.defaultAvatarUrl{
+
+	.defaultAvatarUrl {
 		width: 150rpx;
 		height: 150rpx;
 		background-color: #007aff;
