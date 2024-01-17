@@ -150,7 +150,7 @@
 				iconColor: '#999999',
 				associativeList: [],
 				keyBoardPopup: false,
-				hotWorld: 'DCloud', //	搜索热词，如果没有输入即回车，则搜索热词，但是不会加入搜索记录
+				hotword: '公务员', //	搜索热词，如果没有输入即回车，则搜索热词，但是不会加入搜索记录
 				focus: true, //	是否自动聚焦
 				speechEngine: 'iFly' //	语音识别引擎 iFly 讯飞 baidu 百度
 			}
@@ -191,7 +191,7 @@
 				this.loadList();
 			},
 			search(value) {
-				if (!value && !this.hotWorld) {
+				if (!value && !this.hotword) {
 					return;
 				}
 				if (value) {
@@ -202,8 +202,8 @@
 					this.localSearchListManage(value);
 
 					this.searchLogDbAdd(value)
-				} else if (this.hotWorld) {
-					this.searchText = this.hotWorld
+				} else if (this.hotword) {
+					this.searchText = this.hotword
 				}
 
 				uni.hideKeyboard();
