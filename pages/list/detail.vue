@@ -27,8 +27,11 @@
 						<template v-slot:footer>
 							<view class="footer">
 								<view class="uni-note">截止日期：
-									<uni-dateformat :date="data.apply_deadline" format="yyyy-MM-dd hh:mm"
-										:threshold="[60000, 2592000000]" />
+									<uni-dateformat v-if="isDateString(data.apply_deadline)" :date="data.apply_deadline"
+										format="yyyy-MM-dd hh:mm" :threshold="[60000, 2592000000]" />
+									<view v-else>
+										{{data.apply_deadline}}
+									</view>
 								</view>
 							</view>
 						</template>
@@ -55,6 +58,9 @@
 	const uniShare = new UniShare()
 	// #endif
 	import uParse from "@/components/feng-parse/parse.vue"
+	import {
+		isDateString
+	} from '@/common/utils.js';
 	const db = uniCloud.database();
 	const readNewsLog = db.collection('read-news-log')
 	export default {
@@ -139,6 +145,7 @@
 			$log(...args) {
 				console.log('args', ...args, this.id)
 			},
+			isDateString,
 			async checkArticleIsFavorited(articleId) {
 				const result = await this.articlesCloudObj.is_favorite({
 					'articleId': articleId

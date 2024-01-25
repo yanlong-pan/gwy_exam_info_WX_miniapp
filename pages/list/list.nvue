@@ -41,8 +41,12 @@
 							<text class="title">{{item.title}}</text>
 							<view class="info">
 								<!-- <text class="author">{{item.user_id[0]?item.user_id[0].nickname:''}}</text> -->
-								<uni-dateformat class="last_modify_date" :date="item.apply_deadline" format="yyyy-MM-dd"
+								<uni-dateformat v-if="isDateString(item.apply_deadline)" class="last_modify_date"
+									:date="item.apply_deadline" format="yyyy-MM-dd hh:mm"
 									:threshold="[60000, 2592000000]" />
+								<view v-else class="last_modify_date">
+									{{item.apply_deadline}}
+								</view>
 							</view>
 						</view>
 					</template>
@@ -74,6 +78,9 @@
 	} from "./dropdown-setting.js";
 	import LeDropdown from "@/uni_modules/le-dropdown/components/le-dropdown/le-dropdown";
 	import Gps from '@/uni_modules/json-gps/js_sdk/gps.js';
+	import {
+		isDateString
+	} from '@/common/utils.js';
 
 	const gps = new Gps(),
 		db = uniCloud.database();
@@ -230,7 +237,8 @@
 				}
 				this.buildWhere()
 				console.log('filters: ', this.filters)
-			}
+			},
+			isDateString,
 		},
 		// #ifndef APP-NVUE
 		onPullDownRefresh() {
