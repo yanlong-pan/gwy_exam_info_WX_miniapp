@@ -16,6 +16,12 @@
 				//#endif
 			}
 		}, {
+			"path": "pages/grid/favorite-articles/favorite-articles",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		}, {
 			"path": "pages/list/search/search",
 			"style": {
 				"navigationBarTitleText": "搜索"

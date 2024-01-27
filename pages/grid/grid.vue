@@ -3,16 +3,17 @@
 		<!-- #ifdef APP-PLUS -->
 		<statusBar></statusBar>
 		<!-- #endif -->
-		
+
 		<!-- banner -->
 		<unicloud-db ref="bannerdb" v-slot:default="{data, loading, error, options}" collection="opendb-banner"
 			field="_id,bannerfile,open_url,title" @load="onqueryload">
 			<!-- 当无banner数据时显示占位图 -->
-			<image v-if="!(loading||data.length)" class="banner-image" src="/static/uni-center/headers.png" mode="aspectFill" :draggable="false" />
-			
+			<image v-if="!(loading||data.length)" class="banner-image" src="/static/uni-center/headers.png"
+				mode="aspectFill" :draggable="false" />
+
 			<swiper v-else class="swiper-box" @change="changeSwiper" :current="current" indicator-dots>
-				<swiper-item v-for="(item, index) in data" :key="item._id">
-					<view class="swiper-item" @click="clickBannerItem(item)">
+				<swiper-item v-for="(item, index) in data">
+					<view class="swiper-item" :key="item._id" @click="clickBannerItem(item)">
 						<image class="banner-image" :src="item.bannerfile.url" mode="aspectFill" :draggable="false" />
 					</view>
 				</swiper-item>
@@ -24,17 +25,15 @@
 			<text class="decoration"></text>
 			<text class="section-text">{{$t('grid.grid')}}</text>
 		</view>
-		
+
 		<view class="example-body">
 			<uni-grid :column="3" :highlight="true" @change="change">
 				<template v-for="(item,i) in gridList">
-					<uni-grid-item :index="i" :key="i"
-						v-if="i<3 || i>2&&i<6&&hasLogin || i>5&&uniIDHasRole('admin')"
-					>
+					<uni-grid-item :index="i" :key="i" v-if="i<3 || i>2&&i<6&&hasLogin || i>5&&uniIDHasRole('admin')">
 						<view class="grid-item-box" style="background-color: #fff;">
 							<!-- <image :src="'/static/grid/c'+(i+1)+'.png'" class="image" mode="aspectFill" /> -->
 							<text class="big-number">{{i+1}}</text>
-							<text class="text">{{item}}</text>
+							<text class="text">{{item.text}}</text>
 						</view>
 					</uni-grid-item>
 				</template>
@@ -57,7 +56,7 @@
 			return {
 				gridList: [],
 				current: 0,
-				hasLogin:false
+				hasLogin: false
 			}
 		},
 		onShow() {
@@ -66,28 +65,51 @@
 		onLoad() {
 			let gridList = []
 			for (var i = 0; i < 3; i++) {
-				gridList.push( this.$t('grid.visibleToAll') )
+				gridList.push({
+					text: this.$t('grid.visibleToAll'),
+					nav: ''
+				})
+			}
+
+			gridList.push({
+				text: '我的收藏',
+				nav: '/pages/grid/favorite-articles/favorite-articles'
+			})
+
+			for (var i = 0; i < 2; i++) {
+				gridList.push({
+					text: this.$t('grid.invisibleToTourists'),
+					nav: ''
+				})
 			}
 			for (var i = 0; i < 3; i++) {
-				gridList.push( this.$t('grid.invisibleToTourists') )
-			}
-			for (var i = 0; i < 3; i++) {
-				gridList.push( this.$t('grid.adminVisible') )
+				gridList.push({
+					text: this.$t('grid.adminVisible'),
+					nav: ''
+				})
 			}
 			this.gridList = gridList
 		},
 		methods: {
 			change(e) {
+				const i = e.detail.index
 				uni.showToast({
-					title:this.$t('grid.clickTip') + " " + `${e.detail.index + 1}` + " " + this.$t('grid.clickTipGrid'),
+					title: this.$t('grid.clickTip') + " " + `${i + 1}` + " " + this.$t(
+						'grid.clickTipGrid'),
 					icon: 'none'
 				})
+				const item = this.gridList[i]
+				if (item.nav) {
+					uni.navigateTo({
+						url: item.nav,
+						animationType: 'fade-in'
+					});
+				}
 			},
 			/**
 			 * banner加载后触发的回调
 			 */
-			onqueryload(data) {
-			},
+			onqueryload(data) {},
 			changeSwiper(e) {
 				this.current = e.detail.current
 			},
@@ -98,7 +120,8 @@
 				// 有外部链接-跳转url
 				if (item.open_url) {
 					uni.navigateTo({
-						url: '/uni_modules/uni-id-pages/pages/common/webview/webview?url=' + item.open_url + '&title=' + item.title,
+						url: '/uni_modules/uni-id-pages/pages/common/webview/webview?url=' + item.open_url +
+							'&title=' + item.title,
 						success: res => {},
 						fail: () => {},
 						complete: () => {}
@@ -120,10 +143,12 @@
 		min-height: 100%;
 		height: auto;
 	}
+
 	view {
 		font-size: 14px;
 		line-height: inherit;
 	}
+
 	.example-body {
 		/* #ifndef APP-NVUE */
 		display: flex;
@@ -135,21 +160,24 @@
 		font-size: 14px;
 		background-color: #ffffff;
 	}
+
 	/* #endif */
-	
-	.section-box{
+
+	.section-box {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		padding: 20rpx;
 	}
-	.decoration{
+
+	.decoration {
 		width: 4px;
 		height: 12px;
 		border-radius: 10px;
 		background-color: #2979ff;
 	}
-	.section-text{
+
+	.section-text {
 		color: #333;
 		margin-left: 15rpx;
 	}
@@ -158,6 +186,7 @@
 	.warp {
 		background-color: #fff;
 	}
+
 	/* #endif */
 
 	.example-body {
@@ -170,14 +199,14 @@
 		width: 50rpx;
 		height: 50rpx;
 	}
-	
-	.big-number{
+
+	.big-number {
 		font-size: 50rpx;
 		font-weight: 700;
 		font-stretch: condensed;
-		font-style:oblique;
+		font-style: oblique;
 	}
-	
+
 	.text {
 		text-align: center;
 		font-size: 26rpx;
@@ -230,6 +259,7 @@
 
 	/* #ifndef APP-NVUE || VUE3*/
 	::v-deep
+
 	/* #endif */
 	.uni-searchbar__box {
 		border-width: 0;
@@ -237,6 +267,7 @@
 
 	/* #ifndef APP-NVUE || VUE3 */
 	::v-deep
+
 	/* #endif */
 	.uni-input-placeholder {
 		font-size: 28rpx;

@@ -1,12 +1,12 @@
 export default {
-	tabbar:'List,Grid,contacts,Mine',
-	agreementsTitle:'User service agreement,Privacy policy',
+	tabbar: 'List,Grid,contacts,Mine',
+	agreementsTitle: 'User service agreement,Privacy policy',
 	common: {
 		wechatFriends: "friends",
 		wechatBbs: "bbs",
 		weibo: "weibo",
 		more: "more",
-		agree:"agree",
+		agree: "agree",
 		copy: "copy",
 		wechatApplet: "applet",
 		cancelShare: "cancel sharing",
@@ -27,7 +27,7 @@ export default {
 		submit: "Submit",
 		formatErr: "Incorrect mobile phone number format",
 		sixDigitCode: "Please enter a 6-digit verification code",
-		resetNavTitle:"Reset password"
+		resetNavTitle: "Reset password"
 	},
 	list: {
 		inputPlaceholder: "Please enter the search content",
@@ -49,11 +49,12 @@ export default {
 		adminVisible: "Admin visible",
 		clickTip: "Click the",
 		clickTipGrid: "grid",
+		favoriteArticles: "Favorite",
 	},
 	mine: {
 		showText: "Text",
 		signIn: "Check In Reward",
-		signInByAd:"Check In Reward By AD",
+		signInByAd: "Check In Reward By AD",
 		toEvaluate: "To Evaluate",
 		readArticles: "Read Articles",
 		myScore: "My Score",
@@ -69,7 +70,7 @@ export default {
 		notLogged: "not logged in",
 	},
 	userinfo: {
-		navigationBarTitle:"My Profile",
+		navigationBarTitle: "My Profile",
 		ProfilePhoto: "Profile Photo",
 		nickname: "Nickname",
 		notSet: "not set",
@@ -106,7 +107,7 @@ export default {
 		submit: "submit",
 	},
 	settings: {
-		navigationBarTitle:"Settings",
+		navigationBarTitle: "Settings",
 		userInfo: "Personal Data",
 		changePassword: "change password",
 		clearTmp: "clean cache",
@@ -133,7 +134,7 @@ export default {
 	deactivate: {
 		cancelText: "cancel",
 		nextStep: "next step",
-		navigationBarTitle:"Logout prompt"
+		navigationBarTitle: "Logout prompt"
 	},
 	about: {
 		sacnQR: "Scan the QR Code and your friends can also download it",
@@ -171,7 +172,7 @@ export default {
 		register: "Registered account",
 	},
 	register: {
-		navigationBarTitle:"register",
+		navigationBarTitle: "register",
 		usernamePlaceholder: "Please enter user name",
 		nicknamePlaceholder: "Please enter user nickname",
 		passwordDigitsPlaceholder: "Please enter a 6-20 digit password",
@@ -182,10 +183,10 @@ export default {
 		follow: "Click follow",
 		newsErr: "Error, news ID is empty",
 	},
-	newsLog:{
-		navigationBarTitle:"Reading Log"
+	newsLog: {
+		navigationBarTitle: "Reading Log"
 	},
-	bindMobile:{
-		navigationBarTitle:"Bind Mobile"
+	bindMobile: {
+		navigationBarTitle: "Bind Mobile"
 	}
 }
