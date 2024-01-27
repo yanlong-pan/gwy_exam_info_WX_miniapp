@@ -57,14 +57,9 @@ module.exports = {
 		console.log(msg);
 		const res = await llmManager.chatCompletion({
 			messages: [{
-					role: 'system',
-					content: msg
-				},
-				// {
-				// 	role: 'user',
-				// 	content: userMsg
-				// },
-			]
+				role: 'system',
+				content: msg
+			}]
 		})
 		return res.reply
 	}

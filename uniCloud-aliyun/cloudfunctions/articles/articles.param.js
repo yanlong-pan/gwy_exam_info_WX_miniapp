@@ -15,8 +15,12 @@ const clientInfo = { // 模拟clientInfo
 // 	body: "{\"id\":\"1374df441-b55f-42c0-bd08-fbda02c08058\",\"title\":\"自然资源部北海局所属事业单位2024年公开招聘(不含博士研究生岗位)公告ddd\",\"province\":\"1国家\",\"exam_type\":\"事业单位\",\"info_type\":\"招考公告\",\"collect_date\":1703520000,\"apply_deadline\":\"2024-1-11 24:00\",\"html_content\":\"something\"}"
 // })
 
-max_collect_date({
-	'province': '国家',
-	'exam_type': '公务员',
-	'info_type': '招考公告',
+// max_collect_date({
+// 	'province': '国家',
+// 	'exam_type': '公务员',
+// 	'info_type': '招考公告',
+// })
+
+search_({
+	'query': 'apply_deadline=="2024-01-26 18:00"'
 })

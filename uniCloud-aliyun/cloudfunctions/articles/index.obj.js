@@ -27,6 +27,12 @@ module.exports = {
 			return [true, userId]
 		}
 	},
+	search_: async function(params) {
+		const res = await this.dbJQL.collection('custom-articles')
+			.where(params.query)
+			.get()
+		return res
+	},
 	insert: async function(params) {
 		const httpInfo = this.getHttpInfo()
 		const article = JSON.parse(httpInfo.body)
