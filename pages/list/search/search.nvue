@@ -8,7 +8,7 @@
 				<!-- #endif -->
 				<!-- :cancelText="keyBoardPopup ? '取消' : '搜索'" -->
 				<uni-search-bar ref="searchBar" style="flex:1;" radius="100" v-model="searchText" :focus="focus"
-					:placeholder="hotWord" clearButton="auto" cancelButton="always" @clear="cancel" @confirm="confirm"
+					:placeholder="hotword" clearButton="auto" cancelButton="always" @clear="cancel" @confirm="confirm"
 					@cancel="cancel" />
 			</view>
 		</view>
