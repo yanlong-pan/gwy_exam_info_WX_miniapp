@@ -227,6 +227,7 @@
 				this.filters = []
 				const examTypes = data.children[0].value
 				const infoTypes = data.children[1].value
+				const provinces = data.children[2].value
 				// console.log(examTypes)
 				// console.log(infoTypes)
 				if (examTypes.length) {
@@ -234,6 +235,9 @@
 				}
 				if (infoTypes.length) {
 					this.filters.push(`info_type in ${JSON.stringify(infoTypes)}`)
+				}
+				if (provinces.length) {
+					this.filters.push(`province in ${JSON.stringify(provinces)}`)
 				}
 				this.buildWhere()
 				console.log('filters: ', this.filters)
