@@ -5,3 +5,18 @@ export function isDateString(input) {
 	// 使用正则表达式检查输入是否匹配
 	return dateFormatRegex.test(input);
 }
+
+export function getLocalDatetimeStr(offset) {
+	let now = new Date()
+	const tzOffset = now.getTimezoneOffset() / 60;
+	now.setDate(now.getDate() + offset)
+	now = new Date(now.getTime() + (-tzOffset) * 3600 * 1000)
+	return now.toISOString().replace('T', ' ').replace('Z', '')
+}
+
+export function getDatetimeRange(sOffset, eOffset) {
+	return {
+		startDatetime: getLocalDatetimeStr(sOffset),
+		endDatetime: getLocalDatetimeStr(eOffset)
+	}
+}

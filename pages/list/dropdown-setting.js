@@ -168,6 +168,15 @@ export const DropdownMenu = [{
 	title: '分类筛选',
 	type: 'filter',
 	children: [{
+		title: '截止日期',
+		type: 'slider',
+		value: '',
+		suffix: '天内',
+		componentProps: {
+			min: 1,
+			max: 7,
+		}
+	}, {
 		title: '考试类型',
 		type: 'checkbox',
 		value: [],

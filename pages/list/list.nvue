@@ -79,7 +79,8 @@
 	import LeDropdown from "@/uni_modules/le-dropdown/components/le-dropdown/le-dropdown";
 	import Gps from '@/uni_modules/json-gps/js_sdk/gps.js';
 	import {
-		isDateString
+		isDateString,
+		getDatetimeRange
 	} from '@/common/utils.js';
 
 	const gps = new Gps(),
@@ -111,15 +112,6 @@
 		},
 		watch: {
 			searchText(searchText, oldValue) {
-				// if (searchText) {
-				// 	if (this.where.length) {
-				// 		this.where += ' && '
-				// 	}
-				// 	this.where += `/${searchText}/.test(title)`;
-				// 	console.log('watch', this.where)
-				// } else {
-				// 	this.where = ''
-				// }
 				console.log('searchText: ', searchText)
 				this.buildWhere()
 			}
@@ -225,11 +217,23 @@
 			},
 			onConfirm(data) {
 				this.filters = []
-				const examTypes = data.children[0].value
-				const infoTypes = data.children[1].value
-				const provinces = data.children[2].value
+				console.log('我点了 ', data.children)
+				const deadlineOffset = data.children[0].value
+				const examTypes = data.children[1].value
+				const infoTypes = data.children[2].value
+				const provinces = data.children[3].value
 				// console.log(examTypes)
 				// console.log(infoTypes)
+				if (deadlineOffset) {
+					const {
+						startDatetime,
+						endDatetime
+					} = getDatetimeRange(0, deadlineOffset)
+					// 只保留日期
+					const startDateString = startDatetime.split(' ')[0];
+					const endDateString = endDatetime.split(' ')[0];
+					this.filters.push(`apply_deadline >= "${startDateString}" && apply_deadline <= "${endDateString}"`)
+				}
 				if (examTypes.length) {
 					this.filters.push(`exam_type in ${JSON.stringify(examTypes)}`)
 				}
