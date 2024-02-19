@@ -136,12 +136,12 @@
 			// 	title:"获取定位中"
 			// });
 			//默认h5端不获取定位
-			// #ifndef H5
-			let location = await gps.getLocation({
-				geocode: true
-			})
-			// console.log(location);
-			// #endif
+			// // #ifndef H5
+			// let location = await gps.getLocation({
+			// 	geocode: true
+			// })
+			// // console.log(location);
+			// // #endif
 			// if(location){
 			// 	uni.showToast({
 			// 		title: JSON.stringify(location),
