@@ -19,7 +19,7 @@
 			"path": "pages/grid/favorite-articles/favorite-articles",
 			"style": {
 				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 		}, {
 			"path": "pages/list/search/search",
