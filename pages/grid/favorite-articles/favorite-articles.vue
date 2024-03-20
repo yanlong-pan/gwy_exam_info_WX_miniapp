@@ -56,6 +56,9 @@
 		onPullDownRefresh() {
 			this.refreshData();
 		},
+		onShow() {
+			this.refreshData();
+		},
 		onReachBottom() {
 			this.$refs.udb.loadMore()
 		},
