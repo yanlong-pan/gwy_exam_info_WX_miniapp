@@ -1,5 +1,5 @@
 {
-    "name" : "test-uni-starter",
+    "name" : "gwyyd",
     "appid" : "__UNI__A840A96",
     "description" : "云端一体应用快速开发基本项目模版",
     "versionName" : "0.0.1",
@@ -46,13 +46,20 @@
     },
     "quickapp" : {},
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wxc38633daadfb5f2d",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "minified" : true,
+            "postcss" : true,
+            "es6" : false
         },
         "usingComponents" : true,
         "optimization" : {
             "subPackages" : true
+        },
+        "permission" : {},
+        "uniStatistics" : {
+            "enable" : true
         }
     },
     "mp-alipay" : {
@@ -65,7 +72,8 @@
         "usingComponents" : true
     },
     "uniStatistics" : {
-        "enable" : false
+        "enable" : false,
+        "version" : "2"
     },
     "vueVersion" : "3"
 }
