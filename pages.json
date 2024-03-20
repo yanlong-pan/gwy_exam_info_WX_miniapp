@@ -42,7 +42,8 @@
 						"type": "transparent"
 					}
 				},
-				"navigationBarTitleText": "文章详情"
+				"navigationBarTitleText": "文章详情",
+				"enablePullDownRefresh": true
 			}
 		},
 		{

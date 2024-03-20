@@ -11,8 +11,8 @@
 		<uni-nav-bar :statusBar="true" :border="false"></uni-nav-bar>
 		<!-- #endif -->
 		<view class="article-title">{{ title }}</view>
-		<unicloud-db v-slot:default="{data, loading, error, options}" :options="formData" collection="custom-articles"
-			:field="field" :getone="true" :where="where" :manual="true" ref="detail" @load="loadData">
+		<unicloud-db ref="detail" v-slot:default="{data, loading, error, options}" :options="formData"
+			collection="custom-articles" :field="field" :getone="true" :where="where" :manual="true" @load="loadData">
 			<template v-if="!loading && data">
 				<uni-list :border="false">
 					<uni-list-item>
@@ -135,11 +135,19 @@
 					title: this.$t('listDetail.newsErr')
 				})
 			}
+
 		},
 		onNavigationBarButtonTap(event) {
 			if (event.type == 'share') {
 				this.shareClick();
 			}
+		},
+		onPullDownRefresh() {
+			this.$refs.detail.loadData({
+				clear: true
+			}, (res) => {
+				uni.stopPullDownRefresh()
+			})
 		},
 		methods: {
 			$log(...args) {
@@ -361,13 +369,17 @@
 					uni.downloadFile({
 						url: href,
 						success: function(res) {
-							const filePath = res.tempFilePath;
-							uni.openDocument({
-								filePath: filePath,
-								success: function(res) {
-									console.log(`文件打开成功: ${filePath}`);
-								}
-							});
+							if (res.statusCode === 403) {
+								console.log(res)
+							} else if (res.statusCode === 200) {
+								const filePath = res.tempFilePath;
+								uni.openDocument({
+									filePath: filePath,
+									success: function(res) {
+										console.log(`文件打开成功: ${filePath}`);
+									}
+								});
+							}
 						}
 					});
 				}
